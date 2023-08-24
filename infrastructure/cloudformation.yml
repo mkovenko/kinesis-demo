@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  ApiGatewayToSQS:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: A test API
+      Name: MyRestAPI
+      Body:
+        openapi: 3.0.0
+        info:
+          title: API Gateway -> SQS API
+          version: 1.0.0
+        paths:
+          /telemetry:
+            post:
+              operationId: createTelemetry
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/Telemetry'
+              responses:
+                "200":
+                  description: Event post successfully handled and placed on queue
+                "400":
+                  description: Bad request
+                "500":
+                  description: Server Error
+              x-amazon-apigateway-integration:
+                credentials: !GetAtt ApiGatewayRole.Arn
+                httpMethod: 'POST'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:sqs:path/${AWS::AccountId}/car-telemetry.fifo'
+                responses:
+                  default:
+                    statusCode: '200'
+                requestParameters:
+                  integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+                requestTemplates:
+                  application/json: "#set($dedupId = $context.requestId)\n#set($groupId = $input.json('$.car_id'))\nAction=SendMessage&MessageBody=$input.body&MessageGroupId=$groupId&MessageDeduplicationId=$dedupId"
+                passthroughBehavior: 'never'
+                type: 'aws'
+
+        components:
+          schemas:
+            Telemetry:
+              type: object
+              required:
+                - car_id
+                - created_at
+                - coordinates
+              properties:
+                car_id:
+                  type: integer
+                  format: int64
+                  example: 123456789
+                created_at:
+                  type: string
+                  description: Timestamp in ISO-8601 format UTC
+                  format: date-time
+                  example: 2021-01-01T12:01:00-00:00
+                coordinates:
+                  type: object
+                  required:
+                    - latitude
+                    - longitude
+                  properties:
+                    latitude:
+                      type: number
+                      example: 45.175030
+                    longitude:
+                      type: number
+                      example: 5.647733
+
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ApiGatewayToSQS
+
+  DemoStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: demo
+      RestApiId: !Ref ApiGatewayToSQS
+      DeploymentId: !Ref Deployment
+
+  SQSPushPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: sqs-push-policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "sqs:SendMessage"
+            Resource: !GetAtt Queue.Arn
+
+  ApiGatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: api-gateway-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - !Ref SQSPushPolicy
+
+
+  Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: car-telemetry.fifo
+      FifoQueue: true
+      VisibilityTimeout: 30
+      ReceiveMessageWaitTimeSeconds: 20
+      ContentBasedDeduplication: false
+
+Outputs:
+  ApiGatewayUrl:
+    Value: !Sub 'https://${ApiGatewayToSQS}.execute-api.${AWS::Region}.amazonaws.com/${DemoStage}/'
