@@ -4,7 +4,7 @@ Parameters:
     Type: AWS::EC2::VPC::Id
 
 Resources:
-  ApiGatewayToSQS:
+  ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Description: A test API
@@ -25,7 +25,7 @@ Resources:
                       $ref: '#/components/schemas/Telemetry'
               responses:
                 "200":
-                  description: Event post successfully handled and placed on queue
+                  description: Event post successfully handled and placed to the queue
                 "400":
                   description: Bad request
                 "500":
@@ -79,13 +79,13 @@ Resources:
   Deployment:
     Type: AWS::ApiGateway::Deployment
     Properties:
-      RestApiId: !Ref ApiGatewayToSQS
+      RestApiId: !Ref ApiGateway
 
   DemoStage:
     Type: AWS::ApiGateway::Stage
     Properties:
       StageName: demo
-      RestApiId: !Ref ApiGatewayToSQS
+      RestApiId: !Ref ApiGateway
       DeploymentId: !Ref Deployment
 
   SQSPushPolicy:
@@ -127,4 +127,4 @@ Resources:
 
 Outputs:
   ApiGatewayUrl:
-    Value: !Sub 'https://${ApiGatewayToSQS}.execute-api.${AWS::Region}.amazonaws.com/${DemoStage}/'
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${DemoStage}/'
