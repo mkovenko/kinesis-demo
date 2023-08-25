@@ -32,7 +32,7 @@ Resources:
               x-amazon-apigateway-integration:
                 credentials: !GetAtt ApiGatewayRole.Arn
                 httpMethod: 'POST'
-                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:sqs:path/${AWS::AccountId}/car-telemetry.fifo'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:sqs:path/${AWS::AccountId}/${Queue.QueueName}'
                 responses:
                   default:
                     statusCode: '200'
@@ -102,7 +102,7 @@ Resources:
   ApiGatewayRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: api-gateway-role
+      RoleName: sqs-api-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:

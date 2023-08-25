@@ -41,7 +41,7 @@ Resources:
                 requestTemplates:
                   application/json: !Sub |
                     {
-                    "StreamName": "demo-stream",
+                    "StreamName": "${KinesisStream}",
                     "Records": [
                            {
                             "Data": "$util.base64Encode($input.body)",
