@@ -30,7 +30,7 @@ Resources:
                 "500":
                   description: Server Error
               x-amazon-apigateway-integration:
-                credentials: 'arn:aws:iam::911800220158:role/kinesis-api-gateway-role'
+                credentials: !GetAtt ApiRole.Arn
                 httpMethod: 'POST'
                 uri: !Sub 'arn:aws:apigateway:${AWS::Region}:kinesis:action/PutRecords'
                 responses:
@@ -117,10 +117,10 @@ Resources:
             Resource:
               !GetAtt KinesisStream.Arn
 
-  APIGatewayRole:
+  ApiRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: kinesis-api-gateway-role
+      RoleName: kinesis-api-role
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
