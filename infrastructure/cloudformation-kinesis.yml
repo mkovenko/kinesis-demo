@@ -4,98 +4,97 @@ Parameters:
     Type: AWS::EC2::VPC::Id
 
 Resources:
-#  ApiGateway:
-#    Type: AWS::ApiGateway::RestApi
-#    Properties:
-#      Description: A test API
-#      Name: MyRestAPI
-#      Body:
-#        openapi: 3.0.0
-#        info:
-#          title: API Gateway -> Kinesis API
-#          version: 1.0.0
-#        paths:
-#          /telemetry:
-#            post:
-#              operationId: createTelemetry
-#              requestBody:
-#                content:
-#                  application/json:
-#                    schema:
-#                      $ref: '#/components/schemas/Telemetry'
-#              responses:
-#                "200":
-#                  description: Event post successfully handled and placed to the stream
-#                "400":
-#                  description: Bad request
-#                "500":
-#                  description: Server Error
-#              x-amazon-apigateway-integration:
-#                credentials: !GetAtt ApiGatewayRole.Arn
-#                httpMethod: 'POST'
-#                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:kinesis:action/PutRecords'
-#                responses:
-#                  default:
-#                    statusCode: '200'
-#                requestParameters:
-#                  integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
-#                requestTemplates:
-#                  application/json: !Sub |
-#                    {
-#                    "StreamName": "demo-stream",
-#                    "Records": [
-#                           {
-#                            "Data": "$util.base64Encode($input)",
-#                            "PartitionKey": "$input.params('car_id')"
-#                           }
-#                       ]
-#                    }
-#                passthroughBehavior: 'never'
-#                type: 'aws'
-#
-#        components:
-#          schemas:
-#            Telemetry:
-#              type: object
-#              required:
-#                - car_id
-#                - created_at
-#                - coordinates
-#              properties:
-#                car_id:
-#                  type: integer
-#                  format: int64
-#                  example: 123456789
-#                created_at:
-#                  type: string
-#                  description: Timestamp in ISO-8601 format UTC
-#                  format: date-time
-#                  example: 2021-01-01T12:01:00-00:00
-#                coordinates:
-#                  type: object
-#                  required:
-#                    - latitude
-#                    - longitude
-#                  properties:
-#                    latitude:
-#                      type: number
-#                      example: 45.175030
-#                    longitude:
-#                      type: number
-#                      example: 5.647733
-#
-#
-#  Deployment:
-#    Type: AWS::ApiGateway::Deployment
-#    Properties:
-#      RestApiId: !Ref ApiGateway
-#
-#  DemoStage:
-#    Type: AWS::ApiGateway::Stage
-#    Properties:
-#      StageName: demo
-#      RestApiId: !Ref ApiGateway
-#      DeploymentId: !Ref Deployment
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: Kinesis API
+      Body:
+        openapi: 3.0.0
+        info:
+          title: API Gateway -> Kinesis API
+          version: 1.0.0
+        paths:
+          /telemetry:
+            post:
+              operationId: createTelemetry
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/Telemetry'
+              responses:
+                "200":
+                  description: Event post successfully handled and placed to the stream
+                "400":
+                  description: Bad request
+                "500":
+                  description: Server Error
+              x-amazon-apigateway-integration:
+                credentials: 'arn:aws:iam::911800220158:role/kinesis-api-gateway-role'
+                httpMethod: 'POST'
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:kinesis:action/PutRecords'
+                responses:
+                  default:
+                    statusCode: '200'
+                requestParameters:
+                  integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+                requestTemplates:
+                  application/json: !Sub |
+                    {
+                    "StreamName": "demo-stream",
+                    "Records": [
+                           {
+                            "Data": "$util.base64Encode($input.body)",
+                            "PartitionKey": "$input.json('$.car_id')"
+                           }
+                       ]
+                    }
+                passthroughBehavior: 'never'
+                type: 'aws'
+
+        components:
+          schemas:
+            Telemetry:
+              type: object
+              required:
+                - car_id
+                - created_at
+                - coordinates
+              properties:
+                car_id:
+                  type: integer
+                  format: int64
+                  example: 123456789
+                created_at:
+                  type: string
+                  description: Timestamp in ISO-8601 format UTC
+                  format: date-time
+                  example: 2021-01-01T12:01:00-00:00
+                coordinates:
+                  type: object
+                  required:
+                    - latitude
+                    - longitude
+                  properties:
+                    latitude:
+                      type: number
+                      example: 45.175030
+                    longitude:
+                      type: number
+                      example: 5.647733
+
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref ApiGateway
+
+  DemoStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: demo
+      RestApiId: !Ref ApiGateway
+      DeploymentId: !Ref Deployment
 
 
   KinesisStream:
@@ -133,6 +132,6 @@ Resources:
       ManagedPolicyArns:
         - !Ref KinesisPutPolicy
 
-#Outputs:
-#  ApiGatewayUrl:
-#    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${DemoStage}/'
+Outputs:
+  ApiGatewayUrl:
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${DemoStage}/'
