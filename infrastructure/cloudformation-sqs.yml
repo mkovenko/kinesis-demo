@@ -7,8 +7,7 @@ Resources:
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Description: A test API
-      Name: MyRestAPI
+      Name: SQS Api
       Body:
         openapi: 3.0.0
         info:
