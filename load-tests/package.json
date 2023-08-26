@@ -1,0 +1,13 @@
+{
+  "name": "load-testing",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "sqs:local": "k6 run sqs.js",
+    "sqs:cloud": "k6 cloud sqs.js",
+    "kinesis:local": "k6 run kinesis.js",
+    "kinesis:cloud": "k6 cloud kinesis.js"
+  },
+  "author": "mykola.kovenko@gmail.com",
+  "license": "ISC"
+}
