@@ -59,10 +59,10 @@ Resources:
                   format: int64
                   example: 123456789
                 created_at:
-                  type: string
-                  description: Timestamp in ISO-8601 format UTC
-                  format: date-time
-                  example: 2021-01-01T12:01:00-00:00
+                  type: number
+                  description: Timestamp with milliseconds
+                  example: 1693026444424
+                  min: 1
                 coordinates:
                   type: object
                   required:
