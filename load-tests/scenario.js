@@ -6,7 +6,7 @@ export const generateScenario = ({ numberOfCars }) => ({
       rate: numberOfCars,
       timeUnit: '1s',
       preAllocatedVUs: 1000,
-      maxVUs: 1000,
+      maxVUs: 3000,
     },
   },
 });
