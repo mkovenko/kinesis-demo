@@ -109,7 +109,7 @@ Resources:
   KinesisStream:
     Type: AWS::Kinesis::Stream
     Properties:
-      ShardCount: 12
+      ShardCount: 1
       Name: 'demo-stream'
 
   KinesisPutPolicy:
