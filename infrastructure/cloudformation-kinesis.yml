@@ -1,7 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
+  DbConnectionString:
+    Type: String
+    NoEcho: true
 
 Resources:
   ApiGateway:
@@ -111,6 +115,64 @@ Resources:
     Properties:
       ShardCount: 1
       Name: 'demo-stream'
+
+  LambdaConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: demo-kinesis-consumer
+      Handler: index.handler
+      AutoPublishAlias: live
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: nodejs18.x
+      CodeUri:
+        Bucket: deployment.kinesis-demo
+        Key: archive-v1.zip
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !GetAtt KinesisStream.Arn
+            BatchSize: 10
+            StartingPosition: LATEST
+      Environment:
+        Variables:
+          DB_CONNECTION_STRING: !Ref DbConnectionString
+
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: CloudWatch
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: 'arn:aws:logs:*:*:*'
+              - Effect: Allow
+                Action:
+                  - kinesis:DescribeStream
+                  - kinesis:DescribeStreamSummary
+                  - kinesis:GetRecords
+                  - kinesis:GetShardIterator
+                  - kinesis:ListShards
+                  - kinesis:ListStreams
+                  - kinesis:SubscribeToShard
+                Resource: !GetAtt KinesisStream.Arn
+
 
   KinesisPutPolicy:
     Type: AWS::IAM::ManagedPolicy
