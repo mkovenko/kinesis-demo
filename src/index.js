@@ -40,7 +40,7 @@ const CurrentLocation = sequelize.define('CurrentLocation', {
   ],
 });
 
-await CurrentLocation.sync({ force: true });
+// await CurrentLocation.sync({ force: true });
 
 export const handler = async ({ Records }) => {
   const time = new Date();
