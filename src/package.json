@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "mariadb": "^3.2.0",
+    "sequelize": "^6.32.1"
+  }
+}
