@@ -15,11 +15,11 @@ await sequelize.authenticate();
 const CurrentLocation = sequelize.define('CurrentLocation', {
   car_id: {
     type: DataTypes.INTEGER,
-    primaryKey: true
+    primaryKey: true,
   },
   location_time: {
     type: DataTypes.DATE,
-    allowNull: false
+    allowNull: false,
   },
   latitude: {
     type: DataTypes.DECIMAL(10, 8),
@@ -33,9 +33,14 @@ const CurrentLocation = sequelize.define('CurrentLocation', {
 }, {
   createdAt: false,
   updatedAt: false,
+  indexes: [
+    {
+      fields: ['location_time'],
+    },
+  ],
 });
 
-// await CurrentLocation.sync({ force: true });
+await CurrentLocation.sync({ force: true });
 
 export const handler = async ({ Records }) => {
   const time = new Date();
