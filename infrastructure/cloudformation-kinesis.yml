@@ -119,6 +119,8 @@ Resources:
   LambdaConsumer:
     Type: AWS::Serverless::Function
     Properties:
+      Architectures:
+        - arm64
       FunctionName: demo-kinesis-consumer
       Handler: index.handler
       AutoPublishAlias: live
@@ -126,13 +128,14 @@ Resources:
       Runtime: nodejs18.x
       CodeUri:
         Bucket: deployment.kinesis-demo
-        Key: archive-v1.zip
+        Key: archive-v3.zip
       Events:
         Stream:
           Type: Kinesis
           Properties:
             Stream: !GetAtt KinesisStream.Arn
-            BatchSize: 10
+            BatchSize: 100
+            MaximumBatchingWindowInSeconds: 10
             StartingPosition: LATEST
       Environment:
         Variables:
