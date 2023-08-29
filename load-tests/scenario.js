@@ -2,7 +2,7 @@ export const generateScenario = ({ numberOfCars }) => ({
   scenarios: {
     constant_request_rate: {
       executor: 'constant-arrival-rate',
-      duration: '30s',
+      duration: '10s',
       rate: numberOfCars,
       timeUnit: '1s',
       preAllocatedVUs: 1000,
