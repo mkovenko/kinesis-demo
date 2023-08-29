@@ -113,7 +113,7 @@ Resources:
   KinesisStream:
     Type: AWS::Kinesis::Stream
     Properties:
-      ShardCount: 1
+      ShardCount: 12
       Name: 'demo-stream'
 
   LambdaConsumer:
@@ -128,7 +128,7 @@ Resources:
       Runtime: nodejs18.x
       CodeUri:
         Bucket: deployment.kinesis-demo
-        Key: archive-v3.zip
+        Key: archive-v5.zip
       Events:
         Stream:
           Type: Kinesis
