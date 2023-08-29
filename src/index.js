@@ -3,7 +3,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 
 const sequelize = new Sequelize(process.env.DB_CONNECTION_STRING, {
   pool: {
-    max: 100,
+    max: 10,
     min: 5,
     acquire: 30000,
     idle: 10000,
