@@ -140,7 +140,7 @@ Resources:
       Runtime: nodejs18.x
       CodeUri:
         Bucket: deployment.kinesis-demo
-        Key: archive-v7.zip
+        Key: archive-v8.zip
       Events:
         Sqs:
           Type: SQS
