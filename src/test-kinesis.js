@@ -1,4 +1,4 @@
-import { handler } from './index.js';
+import { handler } from './index-kinesis.js';
 
 const event = {
   "Records": [
