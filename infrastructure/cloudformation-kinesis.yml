@@ -122,13 +122,13 @@ Resources:
       Architectures:
         - arm64
       FunctionName: demo-kinesis-consumer
-      Handler: index.handler
+      Handler: index-kinesis.handler
       AutoPublishAlias: live
       Role: !GetAtt LambdaRole.Arn
       Runtime: nodejs18.x
       CodeUri:
         Bucket: deployment.kinesis-demo
-        Key: archive-v5.zip
+        Key: archive-v7.zip
       Events:
         Stream:
           Type: Kinesis
