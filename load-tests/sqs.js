@@ -5,7 +5,7 @@ import { generateScenario } from './scenario.js';
 // Each car sends 1 request per second
 export const options = generateScenario({ numberOfCars: 310 });
 
-const url = 'https://mmlre2dq6c.execute-api.eu-central-1.amazonaws.com/demo/telemetry';
+const url = 'https://nv97xhwfh5.execute-api.eu-central-1.amazonaws.com/demo/telemetry';
 
 export default function () {
   const payload = generateTelemetry();
