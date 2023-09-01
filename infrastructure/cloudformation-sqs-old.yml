@@ -1,0 +1,97 @@
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+
+Resources:
+  IAMPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: queue-demo-iam-policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "sqs:SendMessage"
+            Resource: !GetAtt Queue.Arn
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: queue-demo-ec2-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      ManagedPolicyArns:
+        - !Ref IAMPolicy
+
+  EC2RoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2Role
+
+  IAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: kinesis-demo-user
+      ManagedPolicyArns:
+        - !Ref IAMPolicy
+
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for queue demo
+      VpcId: !Ref VpcId
+      Tags:
+        - Key: Name
+          Value: queue-demo-web-server
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Egress to everywhere
+          FromPort: 0
+          IpProtocol: "-1"
+          ToPort: 65535
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          Description: SSH from anywhere
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+        - CidrIp: 0.0.0.0/0
+          Description: Http from anywhere
+          FromPort: 8080
+          ToPort: 8080
+          IpProtocol: tcp
+
+  Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: car-telemetry-old.fifo
+      FifoQueue: true
+      VisibilityTimeout: 30
+      ReceiveMessageWaitTimeSeconds: 20
+      ContentBasedDeduplication: false
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref EC2RoleInstanceProfile
+      ImageId: ami-0766f68f0b06ab145  # Depends on the region. Replace hardcoded value
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !Ref WebSecurityGroup
+      Tags:
+        - Key: Name
+          Value: kinesis-demo-old-producer
+
+
+
+Outputs:
+  InstancePublicIp:
+    Value: !GetAtt EC2Instance.PublicIp
