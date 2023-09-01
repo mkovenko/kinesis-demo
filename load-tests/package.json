@@ -5,7 +5,7 @@
   "scripts": {
     "sqs:local": "k6 run sqs.js",
     "sqs-old:local": "k6 run sqs-old.js",
-    "kinesis:local": "k6 run kinesis.js",
+    "kinesis:local": "k6 run kinesis.js"
   },
   "author": "mykola.kovenko@gmail.com",
   "license": "ISC"
