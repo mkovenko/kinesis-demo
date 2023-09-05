@@ -5,7 +5,7 @@ import { generateScenario } from './scenario.js';
 // Each car sends 1 request per second
 export const options = generateScenario({ numberOfCars: 380 });
 
-const url = 'http://3.67.83.108:8080/telemetry';
+const url = 'http://18.192.209.16:8080/telemetry';
 
 export default function () {
   const payload = generateTelemetry();
