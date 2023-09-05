@@ -3,7 +3,7 @@ import { generateTelemetry } from './data.js';
 import { generateScenario } from './scenario.js';
 
 // Each car sends 1 request per second
-export const options = generateScenario({ numberOfCars: 310 });
+export const options = generateScenario({ numberOfCars: 380 });
 
 const url = 'http://3.67.83.108:8080/telemetry';
 
