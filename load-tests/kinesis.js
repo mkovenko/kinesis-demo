@@ -6,7 +6,7 @@ import { generateScenario } from './scenario.js';
 // export const options = generateScenario({ numberOfCars: 10000 });
 export const options = generateScenario({ numberOfCars: 10000 });
 
-const url = 'https://rxg6mw39b0.execute-api.eu-central-1.amazonaws.com/demo/telemetry';
+const url = 'https://4b0y1772x2.execute-api.eu-central-1.amazonaws.com/demo/telemetry';
 
 export default function () {
   const payload = generateTelemetry();
