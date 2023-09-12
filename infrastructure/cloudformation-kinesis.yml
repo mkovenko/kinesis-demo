@@ -111,7 +111,7 @@ Resources:
   KinesisStream:
     Type: AWS::Kinesis::Stream
     Properties:
-      ShardCount: 12
+      ShardCount: 14
       Name: 'demo-stream'
 
   LambdaConsumer:
