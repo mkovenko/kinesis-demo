@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "sqs-old:buses": "k6 run sqs-old-buses.js",
     "sqs-old:lvivelectrotrans": "k6 run sqs-old-lvivelectrotrans.js",
-    "sqs-serverless:lvivelectrotrans": "k6 run sqs.js",
+    "sqs-old:buses": "k6 run sqs-old-buses.js",
+    "sqs-serverless:buses": "k6 run sqs.js",
     "kinesis:lviv": "k6 run kinesis-lviv.js",
     "kinesis:london": "k6 run kinesis-london.js"
   },
